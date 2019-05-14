@@ -23,9 +23,9 @@ class APCluster(object):
                                                    'smallest_x': 100, 'smallest_y': 100}})
 
     def generate_cluster_data(self, ):
-        # dir_all = os.listdir(self.soccer_data_dir)
-        self.soccer_data_dir = '/Users/liu/Desktop/'
-        dir_all = ['919069.json']
+        dir_all = os.listdir(self.soccer_data_dir)
+        # self.soccer_data_dir = '/Users/liu/Desktop/'
+        # dir_all = ['919069.json']
         for game_dir in dir_all:
             # for i in dir_all[1:11]:
 
