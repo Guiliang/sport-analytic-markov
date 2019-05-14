@@ -1,10 +1,14 @@
 import json
 import os
-
+import numpy as np
 import pickle
 
 from config.soccer_config import select_feature_setting
 from sklearn.cluster import AffinityPropagation
+from sklearn.cluster import DBSCAN
+from sklearn.cluster import KMeans
+from itertools import cycle
+import matplotlib.pyplot as plt
 
 
 class APCluster(object):
@@ -19,9 +23,9 @@ class APCluster(object):
                                                    'smallest_x': 100, 'smallest_y': 100}})
 
     def generate_cluster_data(self, ):
-        dir_all = os.listdir(self.soccer_data_dir)
-        # self.soccer_data_dir = '/Users/liu/Desktop/'
-        # dir_all = ['919069.json']
+        # dir_all = os.listdir(self.soccer_data_dir)
+        self.soccer_data_dir = '/Users/liu/Desktop/'
+        dir_all = ['919069.json']
         for game_dir in dir_all:
             # for i in dir_all[1:11]:
 
@@ -55,10 +59,27 @@ class APCluster(object):
             if len(action_data) < 2:
                 print 'number of cluster for action {0} is 0'.format(action)
                 continue
-            preference = -1 * ((action_info.get('largest_x')-action_info.get('smallest_x'))**2 +
-                               (action_info.get('largest_y')-action_info.get('smallest_y'))**2)
-            af = AffinityPropagation(preference=preference).fit(action_data)
-            cluster_centers_indices = af.cluster_centers_indices_
+            # preference = -1 * ((action_info.get('largest_x') - action_info.get('smallest_x')) ** 2 +
+            #                    (action_info.get('largest_y') - action_info.get('smallest_y')) ** 2) ** 0.5
+            # print preference
+            # cluster = AffinityPropagation(preference=preference).fit(action_data)
+            # cluster = DBSCAN(eps=3, min_samples=2).fit(action_data)
+            if len(action_data) <= 6:
+                continue
+            cluster = KMeans(n_clusters=6).fit(action_data)
+            # print cluster.labels_
+            cluster_centers_indices = cluster.cluster_centers_
             print 'number of cluster for action {0} is {1}'.format(action, len(cluster_centers_indices))
             with open(self.model_save_dir + action, 'w') as f:
-                pickle.dump(af, f)
+                pickle.dump(cluster, f)
+            # self.plot_cluster_results(cluster, action_data)
+
+    def plot_cluster_results(self, cluster, action_data):
+        n_clusters_ = len(cluster.cluster_centers_)
+        cluster_number_list = cluster.predict(action_data)
+        colors = cycle('bgrcmykbgrcmykbgrcmykbgrcmyk')
+        for k, col in zip(range(n_clusters_), colors):
+            indices = [i for i, x in enumerate(cluster_number_list) if x == k]
+            data_plot = np.asarray([action_data[index] for index in indices])
+            plt.scatter(data_plot[:,0], data_plot[:,1], c=col)
+        plt.show()

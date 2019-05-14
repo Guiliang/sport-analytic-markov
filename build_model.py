@@ -110,13 +110,14 @@ def run_builder(data_dir, cluster):
     init_node, init_ref_node, init_node_tree, init_ref_node_tree, counterid = init_nodes()
 
     sys.stdout = sys.__stdout__
-    # dir_all = os.listdir(data_dir)
+    dir_all = os.listdir(data_dir)
     # dir_all = os.listdir('/Users/liu/Desktop/sport-analytic/Hockey-Match-All-data/')
 
     cluster_counter = 0
-    cluster = [0]*1519
-    data_dir = '/Users/liu/Desktop/'
-    dir_all = ['919069.json']  # TODO: testing
+    state_counter = 0
+    # cluster = [0]*1519
+    # data_dir = '/Users/liu/Desktop/'
+    # dir_all = ['919069.json']  # TODO: testing
     for game_dir in dir_all:
         # for i in dir_all[1:11]:
         with open(data_dir + game_dir, 'r') as f:
@@ -141,6 +142,7 @@ def run_builder(data_dir, cluster):
         for event_index in range(0, len(events)):  # the number of event
             eve = events[event_index]
             teamId = eve['teamId']
+            state_counter += 1
             # zone = eve['zone']  # zone name
             # judge if it is home
             if teamId == home_id:
@@ -182,16 +184,17 @@ def run_builder(data_dir, cluster):
             else:
                 pre_ref_node = target_ref_node
 
+    print 'number of states is %i' % state_counter
+    print 'states_id is %i' % counterid
+
 
 if __name__ == "__main__":
     counterid = 0
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
     # sys.setrecursionlimit(20000)
     features_train, features_mean_dic, features_scale_dic, actions = select_feature_setting()
-
     # with open('./resource/cluster.json', 'r') as f:
     #     cluster = json.load(f)
-
     run_builder(data_dir=soccer_data_dir, cluster=None)
 
     # game1 = scipy.io.loadmat('./dataset/gamesInfo.mat')
