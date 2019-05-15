@@ -22,6 +22,23 @@ class APCluster(object):
             self.action_data_dict.update({action: {'data': [], 'largest_x': 0, 'largest_y': 0,
                                                    'smallest_x': 100, 'smallest_y': 100}})
 
+    def predict_action_cluster(self, events):
+        cluster_num_all = []
+
+        for event in events:
+            event_action = event['action']
+            event_x = event['x']
+            event_y = event['y']
+            try:
+                cluster = pickle.load(open('./generate_cluster/'+self.model_save_dir + event_action))
+                cluster_num = cluster.predict([[event_x, event_y]])
+                cluster_num_all.append(int(cluster_num[0]))
+            except:
+                print 'can not find cluster for action {0}'.format(event_action)
+                cluster_num_all.append(0)
+
+        return cluster_num_all
+
     def generate_cluster_data(self, ):
         dir_all = os.listdir(self.soccer_data_dir)
         # self.soccer_data_dir = '/Users/liu/Desktop/'
@@ -72,7 +89,7 @@ class APCluster(object):
             print 'number of cluster for action {0} is {1}'.format(action, len(cluster_centers_indices))
             with open(self.model_save_dir + action, 'w') as f:
                 pickle.dump(cluster, f)
-            # self.plot_cluster_results(cluster, action_data)
+                # self.plot_cluster_results(cluster, action_data)
 
     def plot_cluster_results(self, cluster, action_data):
         n_clusters_ = len(cluster.cluster_centers_)
@@ -81,5 +98,5 @@ class APCluster(object):
         for k, col in zip(range(n_clusters_), colors):
             indices = [i for i, x in enumerate(cluster_number_list) if x == k]
             data_plot = np.asarray([action_data[index] for index in indices])
-            plt.scatter(data_plot[:,0], data_plot[:,1], c=col)
+            plt.scatter(data_plot[:, 0], data_plot[:, 1], c=col)
         plt.show()

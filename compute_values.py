@@ -5,7 +5,7 @@ if __name__ == "__main__":
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
 
     dir_all = os.listdir(soccer_data_dir)
-    save_model_dir = ''
+    save_model_dir = './saved_model/markov_model'
     markov_model = pickle.load(open(save_model_dir, 'r'))
 
     markov_model.obj.occ = len(dir_all)

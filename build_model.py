@@ -1,3 +1,8 @@
+import sys
+
+import pickle
+
+sys.path.append('/Local-Scratch/PycharmProjects/sport-analytic-markov/')
 import json
 import sys
 import os
@@ -6,6 +11,7 @@ from nodes.Node_define_lower import TransNode, TransRefNode
 from nodes.Node_define_Tree import NodeTree, RefNodeTree
 from config.soccer_config import select_feature_setting
 from model_tools.model_until import switch_mp
+from generate_cluster.ap_cluster import APCluster
 
 
 def init_nodes():
@@ -110,20 +116,21 @@ def run_builder(data_dir, cluster):
     init_node, init_ref_node, init_node_tree, init_ref_node_tree, counterid = init_nodes()
 
     sys.stdout = sys.__stdout__
-    dir_all = os.listdir(data_dir)
+    # dir_all = os.listdir(data_dir)
     # dir_all = os.listdir('/Users/liu/Desktop/sport-analytic/Hockey-Match-All-data/')
 
     cluster_counter = 0
     state_counter = 0
     # cluster = [0]*1519
-    # data_dir = '/Users/liu/Desktop/'
-    # dir_all = ['919069.json']  # TODO: testing
+    data_dir = '/Users/liu/Desktop/'
+    dir_all = ['919069.json']  # TODO: testing
     for game_dir in dir_all:
         # for i in dir_all[1:11]:
         with open(data_dir + game_dir, 'r') as f:
             game = json.load(f)  # input every game information
         gameId = game['_id']
         events = game['events']
+        cluster_num_list = cluster.predict_action_cluster(events)
 
         print 'Processing game %s' % game_dir.split('.')[0]
         # print 'Processing game %s' % gameId[0][0][0]
@@ -171,7 +178,7 @@ def run_builder(data_dir, cluster):
             home_away_str = 'away' if not home else "home"
 
             nameInfo = event_action + '-' + home_away_str + '-cluster' + str(
-                cluster[cluster_counter])  # pass-home-cluster3'
+                cluster_num_list[cluster_counter])  # pass-home-cluster3'
             cluster_counter += 1
             hist = [str(nameInfo)]  # history ignored, so len(hist)=1
             # print hist
@@ -186,6 +193,11 @@ def run_builder(data_dir, cluster):
 
     print 'number of states is %i' % state_counter
     print 'states_id is %i' % counterid
+    return init_ref_node_tree
+
+
+def save_model(model):
+    pickle.dump(model, open('./saved_model/markov_model', 'w'))
 
 
 if __name__ == "__main__":
@@ -193,10 +205,10 @@ if __name__ == "__main__":
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
     # sys.setrecursionlimit(20000)
     features_train, features_mean_dic, features_scale_dic, actions = select_feature_setting()
-    # with open('./resource/cluster.json', 'r') as f:
-    #     cluster = json.load(f)
-    run_builder(data_dir=soccer_data_dir, cluster=None)
-
+    soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
+    ap_cluster = APCluster(soccer_data_dir)
+    init_ref_node_tree = run_builder(data_dir=soccer_data_dir, cluster=ap_cluster)
+    save_model(init_ref_node_tree)
     # game1 = scipy.io.loadmat('./dataset/gamesInfo.mat')
     # gamesInfo = game1['gamesInfo']
 
