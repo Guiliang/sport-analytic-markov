@@ -1,11 +1,11 @@
 import scipy
-
+import copy
 
 class StateRefNode:
     """
     class static variables
     """
-    allEvents = []
+    allEvents = []  # TODO: it is ugly, remove
     allHome = []
     cluster = []
 
@@ -45,13 +45,13 @@ class StateRefNode:
             p = self.obj.succ  # p is refNode2
             if t == 0:  # home team
                 while p is not None:
-                    p.obj.impact = p.obj.nod.obj.q - self.obj.q  # impact is difference between two q values between nodes
-                    print 'impact', p.obj.impact
+                    p.obj.impact_home = p.obj.nod.obj.q - self.obj.q  # impact is difference between two q values between nodes
+                    print 'impact', p.obj.impact_home
                     p = p.obj.nex2
             else:  # away team
                 while p is not None:
-                    p.obj.impact1 = p.obj.nod.obj.q1 - self.obj.q1
-                    print 'impact1', p.obj.impact1
+                    p.obj.impact_away = p.obj.nod.obj.q1 - self.obj.q1
+                    print 'impact_away', p.obj.impact_away
                     p = p.obj.nex2
             p = self.obj.succ
             while p is not None:
@@ -64,8 +64,8 @@ class StateRefNode:
             # p = refNode2()
             p = self.obj.succ
             while p is not None:
-                print 'impact1 %f' % (p.obj.impact1)
-                print 'impact %f' % (p.obj.impact)
+                print 'impact_away %f' % (p.obj.impact_away)
+                print 'impact_home %f' % (p.obj.impact_home)
                 p.obj.nod.impact_calculate_v0(m)
                 p = p.obj.nex2
 
@@ -83,13 +83,13 @@ class StateRefNode:
             p = self.obj.succ
             if t == 0:
                 while p is not None:
-                    p.obj.impact = p.obj.nod.obj.q - self.obj.q  # Q(s,a) - V(s),
-                    print 'impact', p.obj.impact
+                    p.obj.impact_home = p.obj.nod.obj.q - self.obj.q  # Q(s,a) - V(s),
+                    print 'impact_home', p.obj.impact_home
                     p = p.obj.nex2
             else:
                 while p is not None:
-                    p.obj.impact1 = p.obj.nod.obj.q1 - self.obj.q1
-                    print 'impact1', p.obj.impact1
+                    p.obj.impact_away = p.obj.nod.obj.q1 - self.obj.q1
+                    print 'impact_away', p.obj.impact_away
                     p = p.obj.nex2
             p = self.obj.succ
             while p is not None:
@@ -109,9 +109,9 @@ class StateRefNode:
                     if i > 0:
                         temp = self.allEvents[i]
                         if temp['name'] == ev and self.cluster[i] == cl and t == 0:
-                            sum0 = sum0 + p.obj.impact
+                            sum0 = sum0 + p.obj.impact_home
                         if temp['name'] == ev and self.cluster[i] == cl and t == 1:
-                            sum0 = sum0 + p.obj.impact1
+                            sum0 = sum0 + p.obj.impact_away
                         count += 1
                 p = p.obj.nex2
             p = self.obj.succ
@@ -137,11 +137,11 @@ class StateRefNode:
                         temp = self.allEvents[i]
                         # if (temp['playerId'] == player and self.allhome[i] == 1):
                         if temp['playerId'] == player and self.allHome[i] == 1:
-                            sum0 = sum0 + p.obj.impact
+                            sum0 = sum0 + p.obj.impact_home
                             count += 1.0
                         # if (temp['playerId'] == player and self.allhome[i] == 0):
                         if temp['playerId'] == player and self.allHome[i] == 0:
-                            sum0 = sum0 + p.obj.impact1
+                            sum0 = sum0 + p.obj.impact_away
                             count += 1.0
 
                 p = p.obj.nex2
@@ -197,7 +197,7 @@ class StateRefNode:
                 rr = rr + '-cluster' + str(StateRefNode.cluster[evid])
                 print ' event:%s' % rr,
 
-                print ' transition_occurrence:%i' % p.obj.occ2, ' impact_home:%.5f' % p.obj.impact, ' impact_away:%.5f' % p.obj.impact1,
+                print ' transition_occurrence:%i' % p.obj.occ2, ' impact_home:%.5f' % p.obj.impact_home, ' impact_away:%.5f' % p.obj.impact_away,
                 p = p.obj.nex2
                 print ''
             p = self.obj.succ
@@ -218,9 +218,9 @@ class StateRefNode:
                     if i > 0:
                         temp = self.allEvents[i]
                         if temp['name'] == ev and self.cluster[i] == cl and t == 0:
-                            sum0 = sum0 + p.obj.impact
+                            sum0 = sum0 + p.obj.impact_home
                         if temp['name'] == ev and self.cluster[i] == cl and t == 1:
-                            sum0 = sum0 + p.obj.impact1
+                            sum0 = sum0 + p.obj.impact_away
                         count += 1
                 p = p.obj.nex2
             p = self.obj.succ
@@ -274,10 +274,10 @@ class StateRefNode:
                     if (i > 0):
                         temp = self.allEvents[i]
                         if (temp['playerId'] == player and self.allHome[i] == 1):
-                            sum0 = sum0 + p.obj.impact
+                            sum0 = sum0 + p.obj.impact_home
                             count = count + 1.0
                         if (temp['playerId'] == player and self.allHome[i] == 0):
-                            sum0 = sum0 + p.obj.impact1
+                            sum0 = sum0 + p.obj.impact_away
                             count = count + 1.0
 
                 p = p.obj.nex2
@@ -363,7 +363,7 @@ class StateRefNode:
                 rr = rr + '-cluster' + str(StateRefNode.cluster[evid])
                 print ' event:%s' % rr,
 
-                print ' transition_occurrence:%i' % p.obj.occ2, ' impact_home:%.5f' % p.obj.impact, ' impact_away:%.5f' % p.obj.impact1,
+                print ' transition_occurrence:%i' % p.obj.occ2, ' impact_home:%.5f' % p.obj.impact, ' impact_away:%.5f' % p.obj.impact_away,
                 p = p.obj.nex2
                 print ''
             p = self.obj.succ
@@ -391,8 +391,8 @@ class StateRefNode:
             # p = refNode2()
             p = self.obj.succ
             while (p is not None):
-                print 'impact1 %f' % (p.obj.impact1)
-                print 'impact %f' % (p.obj.impact)
+                print 'impact_away %f' % (p.obj.impact_away)
+                print 'impact_home %f' % (p.obj.impact_home)
                 p.obj.nod.impact_calculate_v0(m)
                 p = p.obj.nex2
 
@@ -408,8 +408,8 @@ class StateRefNode:
 
         if self.obj.vis == m:  # if it is not visited, set it to visited
             self.obj.vis = -m
-            if (self.obj.reward == 1 and t == 0) or (  # if the node represent score
-                            self.obj.rewardAway == 1 and t == 1):  # r is reward?, r for the home team and r1 for the remote team
+            if (self.obj.home_reward == 1 and t == 0) or (  # if the node represent score
+                            self.obj.away_reward == 1 and t == 1):  # r is reward?, r for the home team and r1 for the remote team
 
                 if t == 0:
                     # print "reward home is 1"
@@ -432,11 +432,11 @@ class StateRefNode:
                 # print local_count
                 if t == 0:
                     # compute the v for each state, here q is value
-                    self.obj.q = self.obj.reward + cc / self.obj.occ  # calculate R(s,a)+ sum(s,a,s') Occ(s,a,s')*Value(s')/Occ(s,a)
+                    self.obj.q = self.obj.home_reward + cc / self.obj.occ  # calculate R(s,a)+ sum(s,a,s') Occ(s,a,s')*Value(s')/Occ(s,a)
                     cv = cv + abs(self.obj.q)
 
                 else:
-                    self.obj.q1 = self.obj.rewardAway + cc / self.obj.occ
+                    self.obj.q1 = self.obj.away_reward + cc / self.obj.occ
                     cv = cv + abs(self.obj.q1)
 
             u = self.obj.succ
@@ -458,7 +458,7 @@ class StateRefNode:
 
     def Find(self, item):
         # p = RefNode()
-        p = self
+        p = copy.copy(self)
         while p is not None:
             if p.obj.history == item.history and p.obj.context == item.context:
                 break
@@ -480,7 +480,7 @@ class StateNode:
         if history is not None:
             history = None
         if context is None:
-            context = {'score_difference': 0, 'period': 1, 'manpower': 0}
+            context = None
         if nex is not None:
             nex = None
         if vis is None:

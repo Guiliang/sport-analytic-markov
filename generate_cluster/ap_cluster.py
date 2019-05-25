@@ -25,8 +25,12 @@ class APCluster(object):
 
     def load_cluster(self):
         for action in self.actions:
-            cluster = pickle.load(open('./generate_cluster/' + self.model_save_dir + action))
-            self.loaded_cluster_all.update({action:cluster})
+            try:
+                cluster = pickle.load(open('./generate_cluster/' + self.model_save_dir[2:] + action))
+                self.loaded_cluster_all.update({action: cluster})
+            except:
+                print 'skip cluster {0}'.format(action)
+                continue
 
     def predict_action_cluster(self, events):
         cluster_num_all = []
@@ -35,14 +39,14 @@ class APCluster(object):
             event_action = event['action']
             event_x = event['x']
             event_y = event['y']
-            # try:
-            cluster = self.loaded_cluster_all.get(event_action)
-            # print event_action
-            cluster_num = cluster.predict([[event_x, event_y]])
-            cluster_num_all.append(int(cluster_num[0]))
-            # except:
-            #     print 'can not find cluster for action {0}'.format(event_action)
-            #     cluster_num_all.append(0)
+            try:
+                cluster = self.loaded_cluster_all.get(event_action)
+                # print event_action
+                cluster_num = cluster.predict([[event_x, event_y]])
+                cluster_num_all.append(int(cluster_num[0]))
+            except:
+                print 'can not find cluster for action {0}'.format(event_action)
+                cluster_num_all.append(0)
 
         return cluster_num_all
 

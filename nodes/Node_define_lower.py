@@ -8,8 +8,9 @@ class TransRefNode:
         self.obj = obj
 
     def Find2(self, item):
-        p = TransRefNode()
-        p.obj = self.obj
+        # p = TransRefNode()
+        # p.obj = self.obj
+        p = copy.copy(self)
         while p is not None:
             if p.obj.nod.obj.history == item.history and p.obj.nod.obj.context == item.context:
                 break
@@ -18,7 +19,7 @@ class TransRefNode:
 
 
 class TransNode:
-    def __init__(self, nod=None, occ2=None, nex2=None, impact=None, impact1=None, eventids=None, vis2=None):
+    def __init__(self, nod=None, occ2=None, nex2=None, impact_home=None, impact_away=None, eventids=None, vis2=None):
         if nod is not None:
             nod = None
         self.nod = nod
@@ -28,12 +29,12 @@ class TransNode:
         if nex2 is not None:
             nex2 = None
         self.nex2 = nex2
-        if impact is None:
-            impact = 0
-        self.impact = impact
-        if impact1 is None:
-            impact1 = 0
-        self.impact1 = impact1
+        if impact_home is None:
+            impact_home = 0
+        self.impact_home = impact_home
+        if impact_away is None:
+            impact_away = 0
+        self.impact_away = impact_away
         if eventids is None:
             eventids = []
         self.eventids = eventids

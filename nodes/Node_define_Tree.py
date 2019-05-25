@@ -1,3 +1,6 @@
+import copy
+
+
 class RefNodeTree:
     def __init__(self, obj=None):
         if obj is not None:
@@ -29,7 +32,7 @@ class RefNodeTree:
         """
         # p = RefNodeTree()
         # p.obj = self.obj
-        p = self
+        p = copy.copy(self)
         if p.obj is None:
             return None
         while p is not None:

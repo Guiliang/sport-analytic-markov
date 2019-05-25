@@ -1,3 +1,4 @@
+import copy
 import sys
 
 import pickle
@@ -30,6 +31,8 @@ def init_nodes():
 
 def build_tree(pre_ref_node, temp_ref_node_tree, hist, context, counterid, goal_home, goal_away, cluster_counter):
     """start building the model"""
+    # if hist[0] == 'simple-pass-home-cluster2':
+    #     print 'hi'
     ref_node_tree_found = temp_ref_node_tree.find_tag(hist[0])  # return a refNodeTree
     if ref_node_tree_found is not None:  # if we find them
         # if r == len(hist) - 1:
@@ -92,8 +95,8 @@ def build_tree(pre_ref_node, temp_ref_node_tree, hist, context, counterid, goal_
             target_ref_node.obj)  # return RNT2, check if the transitions has been built before
         if pFinded is None:  # if we fail to find
             # print "not bad"
-            # p = RefNode2()  # if we fail to find, build a new one
-            p = pre_ref_node.obj.succ  # the succ of the Node is a refNode, want to compute Occ(s,a,s')
+            # p = TransRefNode()  # if we fail to find, build a new one
+            p = copy.copy(pre_ref_node.obj.succ)  # the succ of the Node is a refNode, want to compute Occ(s,a,s')
             while p.obj.nex2 is not None:  # locate the new RN to the end of the nex2
                 p = p.obj.nex2
             new_t_ref_node = TransRefNode()
@@ -115,15 +118,15 @@ def build_tree(pre_ref_node, temp_ref_node_tree, hist, context, counterid, goal_
 
 def run_builder(data_dir, cluster):
     init_node, init_ref_node, init_node_tree, init_ref_node_tree, counterid = init_nodes()
-
+    temp_ref_node_tree = init_ref_node_tree
     sys.stdout = sys.__stdout__
-    dir_all = os.listdir(data_dir)
+    # dir_all = os.listdir(data_dir)
     # dir_all = os.listdir('/Users/liu/Desktop/sport-analytic/Hockey-Match-All-data/')
 
     state_counter = 0
     # cluster = [0]*1519
-    # data_dir = '/Users/liu/Desktop/'
-    # dir_all = ['919069.json']  # TODO: testing
+    data_dir = '/Users/liu/Desktop/'
+    dir_all = ['919069.json']  # TODO: testing
     for game_dir in dir_all:
         # for i in dir_all[1:11]:
         with open(data_dir + game_dir, 'r') as f:
@@ -139,14 +142,12 @@ def run_builder(data_dir, cluster):
         home_id = game['homeTeamId']  # home ID
         away_id = game['awayTeamId']
         # con = [0, 1, 0]
-        context = {'score_difference': 0, 'period': 1, 'manpower': 0}
         # first place: number of goal in a game? home team +1 but route team -1 | second place: period? | third place: manpower situation
         # prevPossession = 0
         pre_ref_node = init_ref_node  # pre_ref_node is initialized to the root node, a refNode
         goal_home = 0
         goal_away = 0  # set home/away team score to 0
         # pre_ref_node = init_ref_node
-        temp_ref_node_tree = init_ref_node_tree
         for event_index in range(0, len(events)):  # the number of event
             eve = events[event_index]
             teamId = eve['teamId']
@@ -161,11 +162,9 @@ def run_builder(data_dir, cluster):
             event_action = eve['action']
             event_type = eve['label']
             period = 1 if eve['min'] <= 45 else 2
-            context['period'] = period
-            context['score_difference'] = eve['scoreDiff']
-
-            mp = eve['manPower']  # man power situation
-            context['manpower'] = mp
+            context = {'period': period, 'score_difference': eve['scoreDiff'], 'manpower': eve['manPower']}
+            # mp = eve['manPower']  # man power situation
+            # context['manpower'] = mp
 
             # if make score or a certain type of shot
             if event_action == 'goal':
@@ -191,11 +190,12 @@ def run_builder(data_dir, cluster):
                 pre_ref_node = init_ref_node
             else:
                 pre_ref_node = target_ref_node
-        # break
+                # break
 
     print 'number of states is %i' % state_counter
     print 'states_id is %i' % counterid
-    return init_ref_node_tree
+    init_ref_node.obj.occ = len(dir_all)
+    return init_node, init_ref_node, init_node_tree, init_ref_node_tree
 
 
 # def save_model(model):
@@ -205,6 +205,7 @@ def run_builder(data_dir, cluster):
 
 
 if __name__ == "__main__":
+    'test'
     counterid = 0
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
     # sys.setrecursionlimit(20000)
@@ -212,24 +213,8 @@ if __name__ == "__main__":
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
     ap_cluster = APCluster(soccer_data_dir)
     ap_cluster.load_cluster()
-    init_ref_node_tree = run_builder(data_dir=soccer_data_dir, cluster=ap_cluster)
-
-
-    print 'computing Q-values for home team ...'
-    m = 1
-    markov_model.value_iteration(5, 0.00001, m, 0)
-
-    markov_model.reset_nodes()  # set all the vis to 1
-    print 'computing Q-values for away team ...'
-    markov_model.value_iteration(5, 0.00001, m, 1)
-
-    markov_model.reset_nodes()
-    print 'computing impacts for home team ...'
-    markov_model.compute_impact(m, 0)
-
-    markov_model.reset_nodes()
-    print 'computing impacts for away team ...'
-    markov_model.compute_impact(m, 1)
+    init_node, init_ref_node, init_node_tree, init_ref_node_tree = run_builder(data_dir=soccer_data_dir,
+                                                                               cluster=ap_cluster)
 
     # save_model(init_ref_node_tree)
     # game1 = scipy.io.loadmat('./dataset/gamesInfo.mat')
