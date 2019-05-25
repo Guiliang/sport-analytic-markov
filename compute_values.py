@@ -1,4 +1,5 @@
 import os
+import sys
 import pickle
 
 if __name__ == "__main__":
@@ -15,32 +16,32 @@ if __name__ == "__main__":
     m = 1
     markov_model.value_iteration(5, 0.00001, m, 0)
 
-    markov_model.visit2()  # set all the vis to 1
+    markov_model.reset_nodes()  # set all the vis to 1
     print 'computing Q-values for away team ...'
     markov_model.value_iteration(5, 0.00001, m, 1)
 
-    markov_model.visit2()
+    markov_model.reset_nodes()
     print 'computing impacts for home team ...'
-    markov_model.visit(m, 0)
+    markov_model.compute_impact(m, 0)
 
-    markov_model.visit2()
+    markov_model.reset_nodes()
     print 'computing impacts for away team ...'
-    markov_model.visit(m, 1)
+    markov_model.compute_impact(m, 1)
     #
 
-    RefNode.allEvents = allEvents
-    RefNode.allHome = allHome
-    RefNode.cluster = cluster
-    sys.stdout = open('./modelOutput/statesinfoTest.txt', 'w')
-    markov_model.visit2()
-    m = 1
-    markov_model.visit6()
-    sys.stdout = sys.__stdout__
-    print '************************************************************'
-
-    sys.stdout = open('./modelOutput/transitioninfoTest.txt', 'w')
-    markov_model.visit2()
-    m = 1
-    markov_model.visit7()
-    sys.stdout = sys.__stdout__
-    print '************************************************************'
+    # RefNode.allEvents = allEvents
+    # RefNode.allHome = allHome
+    # RefNode.cluster = cluster
+    # sys.stdout = open('./modelOutput/statesinfoTest.txt', 'w')
+    # markov_model.reset_nodes()
+    # m = 1
+    # markov_model.visit6()
+    # sys.stdout = sys.__stdout__
+    # print '************************************************************'
+    #
+    # sys.stdout = open('./modelOutput/transitioninfoTest.txt', 'w')
+    # markov_model.reset_nodes()
+    # m = 1
+    # markov_model.visit7()
+    # sys.stdout = sys.__stdout__
+    # print '************************************************************'

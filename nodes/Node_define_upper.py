@@ -30,7 +30,7 @@ class StateRefNode:
         self.m = 1
         # self.cluster = cluster
 
-    def visit(self, m, t):
+    def compute_impact(self, m, t):
         """
         compute the impact,
         impact is defined in the transition node
@@ -305,7 +305,7 @@ class StateRefNode:
             cv = 0.0
             m = -m
 
-    def visit2(self):
+    def reset_nodes(self):
         """
         set the all the visited Node to unvisited
         :return: nothing
@@ -315,7 +315,7 @@ class StateRefNode:
             # p = refNode2()
             p = self.obj.succ
             while p is not None:
-                p.obj.nod.visit2()
+                p.obj.nod.reset_nodes()
                 p = p.obj.nex2
 
     def visit6(self, m=1):

@@ -40,7 +40,8 @@ def build_tree(pre_ref_node, temp_ref_node_tree, hist, context, counterid, goal_
             node2find.history = hist
             target_ref_node = ref_node_tree_found.obj.info.Find(node2find)  # find the entire Node bb1
         if target_ref_node:  # if we find the target_ref_node
-            print "target reference node Found"
+            # print "target reference node Found"
+            pass
         else:
             new_node = StateNode()  # create node
             new_node.stateid = counterid
@@ -116,20 +117,20 @@ def run_builder(data_dir, cluster):
     init_node, init_ref_node, init_node_tree, init_ref_node_tree, counterid = init_nodes()
 
     sys.stdout = sys.__stdout__
-    # dir_all = os.listdir(data_dir)
+    dir_all = os.listdir(data_dir)
     # dir_all = os.listdir('/Users/liu/Desktop/sport-analytic/Hockey-Match-All-data/')
 
-    cluster_counter = 0
     state_counter = 0
     # cluster = [0]*1519
-    data_dir = '/Users/liu/Desktop/'
-    dir_all = ['919069.json']  # TODO: testing
+    # data_dir = '/Users/liu/Desktop/'
+    # dir_all = ['919069.json']  # TODO: testing
     for game_dir in dir_all:
         # for i in dir_all[1:11]:
         with open(data_dir + game_dir, 'r') as f:
             game = json.load(f)  # input every game information
         gameId = game['_id']
         events = game['events']
+        cluster_counter = 0
         cluster_num_list = cluster.predict_action_cluster(events)
 
         print 'Processing game %s' % game_dir.split('.')[0]
@@ -190,14 +191,17 @@ def run_builder(data_dir, cluster):
                 pre_ref_node = init_ref_node
             else:
                 pre_ref_node = target_ref_node
+        # break
 
     print 'number of states is %i' % state_counter
     print 'states_id is %i' % counterid
     return init_ref_node_tree
 
 
-def save_model(model):
-    pickle.dump(model, open('./saved_model/markov_model', 'w'))
+# def save_model(model):
+#     model
+#     sys.setrecursionlimit(1500)
+#     pickle.dump(model, open('./saved_model/markov_model', 'w'))
 
 
 if __name__ == "__main__":
@@ -207,8 +211,27 @@ if __name__ == "__main__":
     features_train, features_mean_dic, features_scale_dic, actions = select_feature_setting()
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
     ap_cluster = APCluster(soccer_data_dir)
+    ap_cluster.load_cluster()
     init_ref_node_tree = run_builder(data_dir=soccer_data_dir, cluster=ap_cluster)
-    save_model(init_ref_node_tree)
+
+
+    print 'computing Q-values for home team ...'
+    m = 1
+    markov_model.value_iteration(5, 0.00001, m, 0)
+
+    markov_model.reset_nodes()  # set all the vis to 1
+    print 'computing Q-values for away team ...'
+    markov_model.value_iteration(5, 0.00001, m, 1)
+
+    markov_model.reset_nodes()
+    print 'computing impacts for home team ...'
+    markov_model.compute_impact(m, 0)
+
+    markov_model.reset_nodes()
+    print 'computing impacts for away team ...'
+    markov_model.compute_impact(m, 1)
+
+    # save_model(init_ref_node_tree)
     # game1 = scipy.io.loadmat('./dataset/gamesInfo.mat')
     # gamesInfo = game1['gamesInfo']
 
