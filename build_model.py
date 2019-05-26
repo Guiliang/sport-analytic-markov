@@ -120,13 +120,13 @@ def run_builder(data_dir, cluster):
     init_node, init_ref_node, init_node_tree, init_ref_node_tree, counterid = init_nodes()
     temp_ref_node_tree = init_ref_node_tree
     sys.stdout = sys.__stdout__
-    # dir_all = os.listdir(data_dir)
+    dir_all = os.listdir(data_dir)
     # dir_all = os.listdir('/Users/liu/Desktop/sport-analytic/Hockey-Match-All-data/')
 
     state_counter = 0
     # cluster = [0]*1519
-    data_dir = '/Users/liu/Desktop/'
-    dir_all = ['919069.json']  # TODO: testing
+    # data_dir = '/Users/liu/Desktop/'
+    # dir_all = ['919069.json']  # TODO: testing
     for game_dir in dir_all:
         # for i in dir_all[1:11]:
         with open(data_dir + game_dir, 'r') as f:

@@ -1,5 +1,6 @@
 import sys
 import json
+import os
 from nodes.Node_define_upper import StateNode, StateRefNode
 
 
@@ -21,11 +22,11 @@ def find_impact(hist, init_ref_node_tree, context, pre_ref_node):
 def aggregate_player_impact(init_ref_node_tree, data_dir, cluster, init_ref_node):
     player_impact_dict = {}
     pre_ref_node = init_ref_node
-    # dir_all = os.listdir(data_dir)
+    dir_all = os.listdir(data_dir)
     state_counter = 0
     # cluster = [0]*1519
-    data_dir = '/Users/liu/Desktop/'
-    dir_all = ['919069.json']  # TODO: testing
+    # data_dir = '/Users/liu/Desktop/'
+    # dir_all = ['919069.json']  # TODO: testing
     for game_dir in dir_all:
         # for i in dir_all[1:11]:
         with open(data_dir + game_dir, 'r') as f:
