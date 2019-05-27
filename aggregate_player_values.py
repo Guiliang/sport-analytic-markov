@@ -15,8 +15,11 @@ def find_impact(hist, init_ref_node_tree, context, pre_ref_node):
 
     pFinded = pre_ref_node.obj.succ.Find2(  # TODO: !??
         target_ref_node.obj)
-
-    return pFinded.obj.impact_home, pFinded.obj.impact_away, target_ref_node
+    if pFinded is not None
+        return pFinded.obj.impact_home, pFinded.obj.impact_away, target_ref_node
+    else:
+        print 'pFinded is None'
+        return 0, 0, target_ref_node
 
 
 def aggregate_player_impact(init_ref_node_tree, data_dir, cluster, init_ref_node):
