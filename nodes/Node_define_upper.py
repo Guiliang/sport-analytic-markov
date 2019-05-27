@@ -293,7 +293,7 @@ class StateRefNode:
         cv = 0.0  # current value?
         lv = 0.0  # last value?
         for i in range(number):  # number of iterations
-            cv = self.visit3(m, cv, team)
+            cv = self.visit3(m, cv, team,0)
             er = (cv - lv) / cv  # calculate the error, current value - last value?
             print 'cv is' + str(cv)
             print 'iteration %i' % (i + 1), 'value %.10f' % lv, 'error %.12f' % er
@@ -396,13 +396,14 @@ class StateRefNode:
                 p.obj.nod.impact_calculate_v0(m)
                 p = p.obj.nex2
 
-    def visit3(self, m, cv, t):  # cv is current value?
+    def visit3(self, m, cv, t, r_c):  # cv is current value?
         """
         search all the relevant states to compute the cv(accumulate values), complete a step of value iteration
         The only function has reward
         :param m:
         :param cv:
         :param t:
+        :param t: recursive count
         :return:
         """
 
@@ -441,7 +442,9 @@ class StateRefNode:
 
             u = self.obj.succ
             while u is not None:  # if the model has more state, go on
-                cv = u.obj.nod.visit3(m, cv, t)
+                r_c += 1
+                print 'r_c' + str(r_c)
+                cv = u.obj.nod.visit3(m, cv, t, r_c)
                 u = u.obj.nex2
         return (cv)
 

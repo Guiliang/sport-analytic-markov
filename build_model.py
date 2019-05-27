@@ -97,8 +97,11 @@ def build_tree(pre_ref_node, temp_ref_node_tree, hist, context, counterid, goal_
             # print "not bad"
             # p = TransRefNode()  # if we fail to find, build a new one
             p = copy.copy(pre_ref_node.obj.succ)  # the succ of the Node is a refNode, want to compute Occ(s,a,s')
+            nex2_count = 0
             while p.obj.nex2 is not None:  # locate the new RN to the end of the nex2
                 p = p.obj.nex2
+                nex2_count += 1
+            print nex2_count
             new_t_ref_node = TransRefNode()
             new_t_node = TransNode()
             new_t_ref_node.obj = new_t_node
