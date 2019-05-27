@@ -1,5 +1,6 @@
 import sys
 sys.path.append('/Local-Scratch/PycharmProjects/sport-analytic-markov/')
+sys.setrecursionlimit(9999)
 from config.soccer_config import select_feature_setting
 from model_tools.model_until import switch_mp
 from generate_cluster.ap_cluster import APCluster
