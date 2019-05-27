@@ -1,4 +1,7 @@
+import json
 import sys
+
+
 sys.path.append('/Local-Scratch/PycharmProjects/sport-analytic-markov/')
 sys.setrecursionlimit(9999)
 from config.soccer_config import select_feature_setting
@@ -15,7 +18,8 @@ if __name__ == "__main__":
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
     ap_cluster = APCluster(soccer_data_dir)
     ap_cluster.load_cluster()
-    init_node, init_ref_node, init_node_tree, init_ref_node_tree = run_builder(data_dir=soccer_data_dir, cluster=ap_cluster)
+    init_node, init_ref_node, init_node_tree, init_ref_node_tree = run_builder(data_dir=soccer_data_dir,
+                                                                               cluster=ap_cluster)
 
     print 'computing Q-values for home team ...'
     m = 1
@@ -33,5 +37,7 @@ if __name__ == "__main__":
     print 'computing impacts for away team ...'
     init_ref_node.compute_impact(m, 1)
 
-    aggregate_player_impact(init_ref_node_tree=init_ref_node_tree, data_dir=soccer_data_dir, cluster=ap_cluster, init_ref_node=init_ref_node)
+    player_impact_dict = aggregate_player_impact(init_ref_node_tree=init_ref_node_tree, data_dir=soccer_data_dir,
+                                                 cluster=ap_cluster, init_ref_node=init_ref_node)
 
+    json.dump(player_impact_dict, open('./player_impact/soccer_player_markov_impact.json', 'w'))
