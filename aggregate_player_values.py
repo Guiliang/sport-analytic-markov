@@ -71,7 +71,12 @@ def aggregate_player_impact(init_ref_node_tree, data_dir, cluster, init_ref_node
             context['score_difference'] = eve['scoreDiff']
             mp = eve['manPower']  # man power situation
             context['manpower'] = mp
-            playerId = eve['playerId']
+            try:
+                playerId = eve['playerId']
+            except:
+                print eve
+                playerId = 'Unknown'
+
             # if make score or a certain type of shot
             # if event_action == 'goal':
             #     if home:  # home goal
