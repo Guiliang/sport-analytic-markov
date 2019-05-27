@@ -24,7 +24,6 @@ def find_impact(hist, init_ref_node_tree, context, pre_ref_node):
 
 def aggregate_player_impact(init_ref_node_tree, data_dir, cluster, init_ref_node):
     player_impact_dict = {}
-    pre_ref_node = init_ref_node
     dir_all = os.listdir(data_dir)
     state_counter = 0
     # cluster = [0]*1519
@@ -53,6 +52,7 @@ def aggregate_player_impact(init_ref_node_tree, data_dir, cluster, init_ref_node
         # goal_away = 0  # set home/away team score to 0
         # pre_ref_node = init_ref_node
         # temp_ref_node_tree = init_ref_node_tree
+        pre_ref_node = init_ref_node
         for event_index in range(0, len(events)):  # the number of event
             eve = events[event_index]
             teamId = eve['teamId']
