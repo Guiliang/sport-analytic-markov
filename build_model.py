@@ -33,6 +33,7 @@ def build_tree(pre_ref_node, temp_ref_node_tree, hist, context, counterid, goal_
     """start building the model"""
     # if hist[0] == 'simple-pass-home-cluster2':
     #     print 'hi'
+    nex2_count = 0
     ref_node_tree_found = temp_ref_node_tree.find_tag(hist[0])  # return a refNodeTree
     if ref_node_tree_found is not None:  # if we find them
         # if r == len(hist) - 1:
@@ -97,11 +98,10 @@ def build_tree(pre_ref_node, temp_ref_node_tree, hist, context, counterid, goal_
             # print "not bad"
             # p = TransRefNode()  # if we fail to find, build a new one
             p = copy.copy(pre_ref_node.obj.succ)  # the succ of the Node is a refNode, want to compute Occ(s,a,s')
-            nex2_count = 0
             while p.obj.nex2 is not None:  # locate the new RN to the end of the nex2
                 p = p.obj.nex2
                 nex2_count += 1
-            print nex2_count
+            # print nex2_count
             new_t_ref_node = TransRefNode()
             new_t_node = TransNode()
             new_t_ref_node.obj = new_t_node
@@ -116,7 +116,7 @@ def build_tree(pre_ref_node, temp_ref_node_tree, hist, context, counterid, goal_
     #     print ee.obj.occ2
     new_t_ref_node.obj.eventids.append(cluster_counter - 1)  # new event id
 
-    return target_ref_node
+    return target_ref_node, nex2_count
 
 
 def run_builder(data_dir, cluster):
@@ -151,6 +151,7 @@ def run_builder(data_dir, cluster):
         goal_home = 0
         goal_away = 0  # set home/away team score to 0
         # pre_ref_node = init_ref_node
+        nex2_count_max = 0
         for event_index in range(0, len(events)):  # the number of event
             eve = events[event_index]
             teamId = eve['teamId']
@@ -185,15 +186,17 @@ def run_builder(data_dir, cluster):
             cluster_counter += 1
             hist = [str(nameInfo)]  # history ignored, so len(hist)=1
             # print hist
-            target_ref_node = build_tree(pre_ref_node, temp_ref_node_tree, hist, context,
-                                         counterid, goal_home, goal_away,
-                                         cluster_counter)
-
+            target_ref_node, nex2_count = build_tree(pre_ref_node, temp_ref_node_tree, hist, context,
+                                                     counterid, goal_home, goal_away,
+                                                     cluster_counter)
+            if nex2_count > nex2_count_max:
+                nex2_count_max = nex2_count
             if event_index == (len(events) - 1):  # update prevxx, if it's the end of a game
                 pre_ref_node = init_ref_node
             else:
                 pre_ref_node = target_ref_node
                 # break
+        print "nex2_count_max", nex2_count_max
 
     print 'number of states is %i' % state_counter
     print 'states_id is %i' % counterid
