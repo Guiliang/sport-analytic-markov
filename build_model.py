@@ -119,17 +119,20 @@ def build_tree(pre_ref_node, temp_ref_node_tree, hist, context, counterid, goal_
     return target_ref_node, nex2_count
 
 
-def run_builder(data_dir, cluster):
+def run_builder(data_dir, cluster, test_flag=False):
     init_node, init_ref_node, init_node_tree, init_ref_node_tree, counterid = init_nodes()
     temp_ref_node_tree = init_ref_node_tree
     sys.stdout = sys.__stdout__
-    dir_all = os.listdir(data_dir)
+    # dir_all = os.listdir(data_dir)
     # dir_all = os.listdir('/Users/liu/Desktop/sport-analytic/Hockey-Match-All-data/')
 
     state_counter = 0
     # cluster = [0]*1519
-    # data_dir = '/Users/liu/Desktop/'
-    # dir_all = ['919069.json']  # TODO: testing
+    if test_flag:
+        data_dir = '/Users/liu/Desktop/'
+        dir_all = ['919069.json']  # TODO: testing
+    else:
+        dir_all = os.listdir(data_dir)
     for game_dir in dir_all:
         # for i in dir_all[1:11]:
         with open(data_dir + game_dir, 'r') as f:
@@ -185,7 +188,7 @@ def run_builder(data_dir, cluster):
                 cluster_num_list[cluster_counter])  # pass-home-cluster3'
             cluster_counter += 1
             hist = [str(nameInfo)]  # history ignored, so len(hist)=1
-            # print hist
+            print hist
             target_ref_node, nex2_count = build_tree(pre_ref_node, temp_ref_node_tree, hist, context,
                                                      counterid, goal_home, goal_away,
                                                      cluster_counter)
