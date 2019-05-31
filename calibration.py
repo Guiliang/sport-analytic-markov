@@ -6,7 +6,8 @@ import datetime
 
 
 class Calibration:
-    def __init__(self, bins, data_path, calibration_features, cluster, init_ref_node_tree, focus_actions_list=[]):
+    def __init__(self, bins, data_path, calibration_features, cluster,
+                 init_ref_node_tree, data_store_dir, data_name, focus_actions_list=[]):
         self.bins = bins
         # self.bins_names = bins.keys()
         self.data_path = data_path
@@ -20,6 +21,8 @@ class Calibration:
         self.teams = ['home', 'away', 'end']
         self.cluster = cluster
         self.init_ref_node_tree = init_ref_node_tree
+        self.data_store_dir = data_store_dir
+        self.data_name = data_name
         # learning_rate = tt_lstm_config.learn.learning_rate
         # pass
 
@@ -96,6 +99,8 @@ class Calibration:
             cluster_counter = 0
             cluster_num_list = self.cluster.predict_action_cluster(events)
 
+            v_game_dict = {}
+
             for index in range(0, len(features_values_dict_all)):
                 action = actions_team_all[index]['action']  # find the action we focus
                 continue_flag = False if len(self.focus_actions_list) == 0 else True
@@ -162,6 +167,7 @@ class Calibration:
 
                 v_home, v_away = find_Qs(hist, self.init_ref_node_tree, context)
                 model_value = [v_home, v_away, 0]
+                v_game_dict.update({index: {'home': v_home, 'away': v_away, 'end': 0}})
 
                 for i in range(len(self.teams)):  # [home, away,end]
                     cali_sum[i] = cali_sum[i] + calibration_value[i]
@@ -172,6 +178,9 @@ class Calibration:
                                                                          'number': number}})
 
                 # break
+
+            with open(self.data_store_dir + "/" + json_dir.split('.')[0] + "/" + self.data_name, 'w') as outfile:
+                json.dump(v_game_dict, outfile)
 
     def compute_distance(self):
         cali_dict_strs = self.calibration_values_all_dict.keys()

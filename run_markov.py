@@ -12,6 +12,7 @@ from player_values_tools import aggregate_player_impact
 
 if __name__ == "__main__":
     counterid = 0
+    iter_num = 50
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
     test_flag = False
     # sys.setrecursionlimit(20000)
@@ -23,11 +24,11 @@ if __name__ == "__main__":
 
     print 'computing Q-values for home team ...'
     m = 1
-    init_ref_node.value_iteration(50, 0.00001, m, 0)
+    init_ref_node.value_iteration(iter_num, 0.00001, m, 0)
 
     init_ref_node.reset_nodes()  # set all the vis to 1
     print 'computing Q-values for away team ...'
-    init_ref_node.value_iteration(50, 0.00001, m, 1)
+    init_ref_node.value_iteration(iter_num, 0.00001, m, 1)
 
     init_ref_node.reset_nodes()
     print 'computing impacts for home team ...'
@@ -48,12 +49,15 @@ if __name__ == "__main__":
                         'pitch': {'feature_name': ('x'), 'range': ('left', 'right')},
                         'manpower': {'feature_name': ('manPower'), 'range': (-3, -2, -1, 0, 1, 2, 3)}
                         }
+    data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
+    data_name = 'markov_values_iter{0}'.format(str(iter_num))
 
     # soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
 
     Cali = Calibration(bins=calibration_bins, data_path=soccer_data_dir,
                        calibration_features=calibration_features, cluster=ap_cluster,
-                       init_ref_node_tree=init_ref_node_tree, focus_actions_list=['shot', 'pass'])
+                       init_ref_node_tree=init_ref_node_tree, data_store_dir = data_store_dir,
+                       focus_actions_list=['shot', 'pass'], data_name=data_name)
     Cali.construct_bin_dicts()
     Cali.aggregate_calibration_values(test_flag=test_flag)
     Cali.compute_distance()
