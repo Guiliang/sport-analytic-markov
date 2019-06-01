@@ -1,6 +1,7 @@
 import scipy
 import copy
 
+
 class StateRefNode:
     """
     class static variables
@@ -293,7 +294,7 @@ class StateRefNode:
         cv = 0.0  # current value?
         lv = 0.0  # last value?
         for i in range(number):  # number of iterations
-            cv = self.visit3(m, cv, team,0)
+            cv = self.visit3(m, cv, team, 0, scale=10)
             er = (cv - lv) / cv  # calculate the error, current value - last value?
             print 'cv is' + str(cv)
             print 'iteration %i' % (i + 1), 'value %.10f' % lv, 'error %.12f' % er
@@ -396,7 +397,7 @@ class StateRefNode:
                 p.obj.nod.impact_calculate_v0(m)
                 p = p.obj.nex2
 
-    def visit3(self, m, cv, t, r_c):  # cv is current value?
+    def visit3(self, m, cv, t, r_c, scale=1):  # cv is current value?
         """
         search all the relevant states to compute the cv(accumulate values), complete a step of value iteration
         The only function has reward
@@ -433,18 +434,18 @@ class StateRefNode:
                 # print local_count
                 if t == 0:
                     # compute the v for each state, here q is value
-                    self.obj.q = self.obj.home_reward + cc / self.obj.occ  # calculate R(s,a)+ sum(s,a,s') Occ(s,a,s')*Value(s')/Occ(s,a)
+                    self.obj.q = self.obj.home_reward + scale * cc / self.obj.occ  # calculate R(s,a)+ sum(s,a,s') Occ(s,a,s')*Value(s')/Occ(s,a)
                     cv = cv + abs(self.obj.q)
 
                 else:
-                    self.obj.q1 = self.obj.away_reward + cc / self.obj.occ
+                    self.obj.q1 = self.obj.away_reward + scale * cc / self.obj.occ
                     cv = cv + abs(self.obj.q1)
 
             u = self.obj.succ
             while u is not None:  # if the model has more state, go on
                 r_c += 1
                 print 'r_c' + str(r_c)
-                cv = u.obj.nod.visit3(m, cv, t, r_c)
+                cv = u.obj.nod.visit3(m, cv, t, r_c, scale)
                 u = u.obj.nex2
         return (cv)
 
