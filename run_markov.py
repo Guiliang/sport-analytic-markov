@@ -1,3 +1,4 @@
+import datetime
 import json
 import sys
 from calibration import Calibration, generate_cali_latex_table
@@ -41,7 +42,9 @@ if __name__ == "__main__":
     player_impact_dict = aggregate_player_impact(init_ref_node_tree=init_ref_node_tree, data_dir=soccer_data_dir,
                                                  cluster=ap_cluster, init_ref_node=init_ref_node,test_flag=test_flag)
 
-    # json.dump(player_impact_dict, open('./player_impact/soccer_player_markov_impact.json', 'w'))
+    json.dump(player_impact_dict, open('./player_impact/'
+                                       'soccer_player_markov_impact-{0}.json'.
+                                       format(datetime.date.today().strftime("%Y%B%d")), 'w'))
 
     calibration_features = ['period', 'score_differential', 'pitch', 'manpower']
     calibration_bins = {'period': {'feature_name': ('sec', 'min'), 'range': (1, 2)},
