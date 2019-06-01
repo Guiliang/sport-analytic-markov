@@ -13,7 +13,7 @@ from player_values_tools import aggregate_player_impact
 
 if __name__ == "__main__":
     counterid = 0
-    iter_num = 50
+    iter_num = 100
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
     test_flag = False
     # sys.setrecursionlimit(20000)
