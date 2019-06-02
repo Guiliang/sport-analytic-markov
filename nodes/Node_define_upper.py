@@ -1,5 +1,6 @@
 import scipy
 import copy
+from Node_define_lower import TransRefNode
 
 
 class StateRefNode:
@@ -31,7 +32,7 @@ class StateRefNode:
         self.m = 1
         # self.cluster = cluster
 
-    def compute_impact(self, m, t):
+    def compute_impact(self, m, t, if_probability=False):
         """
         compute the impact,
         impact is defined in the transition node
@@ -42,28 +43,40 @@ class StateRefNode:
         if self.obj.vis == m:
             self.obj.vis = -m
             # print self.obj.history
-            # p = refNode2()
-            p = self.obj.succ  # p is refNode2
+            # p = TransRefNode()
+            p = copy.copy(self.obj.succ)  # p is refNode2
             if t == 0:  # home team
                 while p is not None:
-                    p.obj.impact_home = p.obj.nod.obj.q - self.obj.q  # impact is difference between two q values between nodes
+                    if if_probability:
+                        q_front = p.obj.nod.obj.q / (p.obj.nod.obj.q + p.obj.nod.obj.q1) if (
+                                                                                            p.obj.nod.obj.q + p.obj.nod.obj.q1) > 0 else 0
+                        q_back = self.obj.q / (self.obj.q + self.obj.q1) if (self.obj.q + self.obj.q1) > 0 else 0
+                        p.obj.impact_home = q_front - q_back
+                    else:
+                        p.obj.impact_home = p.obj.nod.obj.q - self.obj.q  # impact is difference between two q values between nodes
                     print 'impact', p.obj.impact_home
                     p = p.obj.nex2
             else:  # away team
                 while p is not None:
-                    p.obj.impact_away = p.obj.nod.obj.q1 - self.obj.q1
+                    if if_probability:
+                        q1_front = p.obj.nod.obj.q1 / (p.obj.nod.obj.q + p.obj.nod.obj.q1) if (
+                                                                                            p.obj.nod.obj.q + p.obj.nod.obj.q1) > 0 else 0
+                        q1_back = self.obj.q1 / (self.obj.q + self.obj.q1) if (self.obj.q + self.obj.q1) > 0 else 0
+                        p.obj.impact_away = q1_front - q1_back
+                    else:
+                        p.obj.impact_away = p.obj.nod.obj.q1 - self.obj.q1
                     print 'impact_away', p.obj.impact_away
                     p = p.obj.nex2
             p = self.obj.succ
             while p is not None:
-                p.obj.nod.impact_calculate_v1(m, t)
+                p.obj.nod.compute_impact(m, t)
                 p = p.obj.nex2
 
     def impact_calculate_v0(self, m):
         if self.obj.vis == m:
             self.obj.vis = -m
             # p = refNode2()
-            p = self.obj.succ
+            p = self.obj.succ  # TODO: could be a mistake
             while p is not None:
                 print 'impact_away %f' % (p.obj.impact_away)
                 print 'impact_home %f' % (p.obj.impact_home)
@@ -81,7 +94,7 @@ class StateRefNode:
             self.obj.vis = -m
             # print self.obj.history
             # p = refNode2()
-            p = self.obj.succ
+            p = self.obj.succ  # TODO: could be a mistake
             if t == 0:
                 while p is not None:
                     p.obj.impact_home = p.obj.nod.obj.q - self.obj.q  # Q(s,a) - V(s),
@@ -103,7 +116,7 @@ class StateRefNode:
         if self.obj.vis == m:
             self.obj.vis = -m
             # p = refNode2()
-            p = self.obj.succ
+            p = self.obj.succ  # TODO: could be a mistake
             while p is not None:
                 eventIds = p.obj.eventids
                 for i in eventIds:
@@ -129,7 +142,7 @@ class StateRefNode:
         if self.obj.vis == m:
             self.obj.vis = -m
             # p = refNode2()
-            p = self.obj.succ
+            p = self.obj.succ  # TODO: could be a mistake
             while p is not None:
                 evIds = p.obj.eventids
                 for i in evIds:
@@ -162,7 +175,7 @@ class StateRefNode:
         if self.obj.vis == self.m:
             self.obj.vis = -self.m
             # p = refNode2()
-            p = self.obj.succ
+            p = self.obj.succ  # TODO: could be a mistake
             print "id:%06d" % self.obj.stateid, ' context:[goal differential:%i' % self.obj.context[0], 'period:%i' % \
                                                                                                         self.obj.context[
                                                                                                             1], 'manpower:',
@@ -212,7 +225,7 @@ class StateRefNode:
         if self.obj.vis == m:
             self.obj.vis = -m
             # p = refNode2()
-            p = self.obj.succ
+            p = self.obj.succ  # TODO: could be a mistake
             while p is not None:
                 evids = p.obj.eventids
                 for i in evids:
@@ -238,7 +251,7 @@ class StateRefNode:
         if (self.obj.vis == m):
             self.obj.vis = -m
             # p = refNode2()
-            p = self.obj.succ
+            p = self.obj.succ  # TODO: could be a mistake
             while (p != None):
                 evids = p.obj.eventids
                 for i in evids:
@@ -268,7 +281,7 @@ class StateRefNode:
         if (self.obj.vis == m):
             self.obj.vis = -m
             # p = refNode2()
-            p = self.obj.succ
+            p = self.obj.succ  # TODO: could be a mistake
             while (p != None):
                 evids = p.obj.eventids
                 for i in evids:
@@ -294,7 +307,7 @@ class StateRefNode:
         cv = 0.0  # current value?
         lv = 0.0  # last value?
         for i in range(number):  # number of iterations
-            cv = self.dynamic_programming(m, cv, team, 0, scale=2)
+            cv = self.dynamic_programming(m, cv, team, 0, scale=1)
             er = (cv - lv) / cv  # calculate the error, current value - last value?
             print 'cv is' + str(cv)
             print 'iteration %i' % (i + 1), 'value %.10f' % lv, 'error %.12f' % er
@@ -444,7 +457,7 @@ class StateRefNode:
             u = self.obj.succ
             while u is not None:  # if the model has more state, go on
                 r_c += 1
-                print 'r_c' + str(r_c)
+                # print 'r_c' + str(r_c)
                 cv = u.obj.nod.dynamic_programming(m, cv, t, r_c, scale)
                 u = u.obj.nex2
         return (cv)

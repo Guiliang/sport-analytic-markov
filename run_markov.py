@@ -33,11 +33,11 @@ if __name__ == "__main__":
 
     init_ref_node.reset_nodes()
     print 'computing impacts for home team ...'
-    init_ref_node.compute_impact(m, 0)
+    init_ref_node.compute_impact(m, 0, if_probability=True)
 
     init_ref_node.reset_nodes()
     print 'computing impacts for away team ...'
-    init_ref_node.compute_impact(m, 1)
+    init_ref_node.compute_impact(m, 1, if_probability=True)
 
     player_impact_dict = aggregate_player_impact(init_ref_node_tree=init_ref_node_tree, data_dir=soccer_data_dir,
                                                  cluster=ap_cluster, init_ref_node=init_ref_node,test_flag=test_flag)

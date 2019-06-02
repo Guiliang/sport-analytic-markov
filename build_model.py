@@ -188,7 +188,7 @@ def run_builder(data_dir, cluster, test_flag=False):
                 cluster_num_list[cluster_counter])  # pass-home-cluster3'
             cluster_counter += 1
             hist = [str(nameInfo)]  # history ignored, so len(hist)=1
-            print hist
+            # print hist
             target_ref_node, nex2_count = build_tree(pre_ref_node, temp_ref_node_tree, hist, context,
                                                      counterid, goal_home, goal_away,
                                                      cluster_counter)
@@ -199,7 +199,7 @@ def run_builder(data_dir, cluster, test_flag=False):
             else:
                 pre_ref_node = target_ref_node
                 # break
-        print "nex2_count_max", nex2_count_max
+        # print "nex2_count_max", nex2_count_max
 
     print 'number of states is %i' % state_counter
     print 'states_id is %i' % counterid
