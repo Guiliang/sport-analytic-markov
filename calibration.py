@@ -200,7 +200,11 @@ class Calibration:
                 cali_record_dict += '\t{0}_model'.format(self.teams[i]) + ":" + str(model_prob)
                 model_prob = model_prob + 1e-10
                 cali_prob = cali_prob + 1e-10
-                kld = cali_prob * math.log(cali_prob / model_prob)
+                try:
+                    kld = cali_prob * math.log(cali_prob / model_prob)
+                except:
+                    print 'rate is ' + str(cali_prob / model_prob)
+                    kld = 0
                 kld_sum += kld
                 ae = abs(cali_prob - model_prob)
                 mae_sum = mae_sum + ae
