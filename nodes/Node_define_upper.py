@@ -40,6 +40,8 @@ class StateRefNode:
         :param t: team 1/0
         :return: nothing
         """
+        if if_probability:
+            print 'applying probability'
         if self.obj.vis == m:
             self.obj.vis = -m
             # print self.obj.history
@@ -307,7 +309,7 @@ class StateRefNode:
         cv = 0.0  # current value?
         lv = 0.0  # last value?
         for i in range(number):  # number of iterations
-            cv = self.dynamic_programming(m, cv, team, 0, scale=1)
+            cv = self.dynamic_programming(m, cv, team, 0, scale=2)
             er = (cv - lv) / cv  # calculate the error, current value - last value?
             print 'cv is' + str(cv)
             print 'iteration %i' % (i + 1), 'value %.10f' % lv, 'error %.12f' % er
