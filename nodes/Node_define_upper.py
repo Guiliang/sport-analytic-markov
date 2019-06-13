@@ -309,7 +309,7 @@ class StateRefNode:
         cv = 0.0  # current value?
         lv = 0.0  # last value?
         for i in range(number):  # number of iterations
-            cv = self.dynamic_programming(m, cv, team, 0, scale=1.2)
+            cv = self.dynamic_programming(m, cv, team, 0, scale=1.02) # 1.02
             er = (cv - lv) / cv  # calculate the error, current value - last value?
             print 'cv is' + str(cv)
             print 'iteration %i' % (i + 1), 'value %.10f' % lv, 'error %.12f' % er
