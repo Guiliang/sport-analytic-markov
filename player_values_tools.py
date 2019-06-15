@@ -136,13 +136,14 @@ def aggregate_player_impact(init_ref_node_tree, data_dir, cluster, init_ref_node
             # print hist
             impact_home, impact_away, target_ref_node = find_impact(hist, init_ref_node_tree, context, pre_ref_node)
             pre_ref_node = target_ref_node
-            try:
-                player_impact_sum = player_impact_dict[playerId]
+
+            player_impact_sum = player_impact_dict[playerId]
+            if player_impact_sum is not None:
                 if home:
                     player_impact_sum += impact_home
                 else:
                     player_impact_sum += impact_away
-            except:
+            else:
                 if home:
                     player_impact_sum = impact_home
                 else:
