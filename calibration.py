@@ -108,9 +108,6 @@ class Calibration:
                     if f_action in action:
                         print action
                         continue_flag = False
-                if continue_flag:
-                    cluster_counter += 1
-                    continue
 
                 features_values_dict = features_values_dict_all[index]
                 cali_dict_str = ''
@@ -168,6 +165,10 @@ class Calibration:
                 v_home, v_away = find_Qs(hist, self.init_ref_node_tree, context)
                 model_value = [v_home, v_away, 0]
                 v_game_dict.update({index: {'home': v_home, 'away': v_away, 'end': 0}})
+
+                if continue_flag:
+                    # cluster_counter += 1
+                    continue
 
                 for i in range(len(self.teams)):  # [home, away,end]
                     cali_sum[i] = cali_sum[i] + calibration_value[i]
