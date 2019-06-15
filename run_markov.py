@@ -15,6 +15,7 @@ if __name__ == "__main__":
     counterid = 0
     iter_num = 100
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
+    data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
     test_flag = False
     # sys.setrecursionlimit(20000)
     features_train, features_mean_dic, features_scale_dic, actions = select_feature_setting()
@@ -40,7 +41,8 @@ if __name__ == "__main__":
     init_ref_node.compute_impact(m, 1, if_probability=True)
 
     player_impact_dict = aggregate_player_impact(init_ref_node_tree=init_ref_node_tree, data_dir=soccer_data_dir,
-                                                 cluster=ap_cluster, init_ref_node=init_ref_node,test_flag=test_flag)
+                                                 cluster=ap_cluster, init_ref_node=init_ref_node, test_flag=test_flag,
+                                                 data_store_dir=data_store_dir)
 
     json.dump(player_impact_dict, open('./player_impact/'
                                        'soccer_player_markov_impact-{0}.json'.
@@ -52,14 +54,13 @@ if __name__ == "__main__":
                         'pitch': {'feature_name': ('x'), 'range': ('left', 'right')},
                         'manpower': {'feature_name': ('manPower'), 'range': (-3, -2, -1, 0, 1, 2, 3)}
                         }
-    data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
     data_name = 'markov_values_iter{0}'.format(str(iter_num))
 
     # soccer_data_store_dir = "/cs/oschulte/Galen/Soccer-data"
 
     Cali = Calibration(bins=calibration_bins, data_path=soccer_data_dir,
                        calibration_features=calibration_features, cluster=ap_cluster,
-                       init_ref_node_tree=init_ref_node_tree, data_store_dir = data_store_dir,
+                       init_ref_node_tree=init_ref_node_tree, data_store_dir=data_store_dir,
                        focus_actions_list=['shot', 'pass'], data_name=data_name)
     Cali.construct_bin_dicts()
     Cali.aggregate_calibration_values(test_flag=test_flag)
