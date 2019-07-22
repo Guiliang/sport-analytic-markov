@@ -17,6 +17,7 @@ if __name__ == "__main__":
     soccer_data_dir = '/cs/oschulte/soccer-data/sequences_append_goal/'
     data_store_dir = "/cs/oschulte/Galen/Soccer-data/"
     test_flag = False
+    focus_action = '_shot'
     # sys.setrecursionlimit(20000)
     features_train, features_mean_dic, features_scale_dic, actions = select_feature_setting()
     ap_cluster = APCluster(soccer_data_dir)
@@ -42,11 +43,11 @@ if __name__ == "__main__":
 
     player_impact_dict = aggregate_player_impact(init_ref_node_tree=init_ref_node_tree, data_dir=soccer_data_dir,
                                                  cluster=ap_cluster, init_ref_node=init_ref_node, test_flag=test_flag,
-                                                 data_store_dir=data_store_dir)
+                                                 data_store_dir=data_store_dir, focus_action=focus_action)
 
     json.dump(player_impact_dict, open('./player_impact/'
-                                       'soccer_player_markov_impact-{0}.json'.
-                                       format(datetime.date.today().strftime("%Y%B%d")), 'w'))
+                                       'soccer_player_markov_impact-{0}{1}.json'.
+                                       format(datetime.date.today().strftime("%Y%B%d"), focus_action), 'w'))
 
     calibration_features = ['period', 'score_differential', 'pitch', 'manpower']
     calibration_bins = {'period': {'feature_name': ('sec', 'min'), 'range': (1, 2)},

@@ -69,7 +69,9 @@ def find_impact(hist, init_ref_node_tree, context, pre_ref_node):
         return 0, 0, target_ref_node
 
 
-def aggregate_player_impact(init_ref_node_tree, data_dir, cluster, init_ref_node, data_store_dir, test_flag=False):
+def aggregate_player_impact(init_ref_node_tree, data_dir,
+                            cluster, init_ref_node, data_store_dir,
+                            focus_action, test_flag=False):
     player_impact_dict = {}
     if test_flag:
         data_dir = '/Users/liu/Desktop/'
@@ -139,21 +141,21 @@ def aggregate_player_impact(init_ref_node_tree, data_dir, cluster, init_ref_node
             impact_home, impact_away, target_ref_node = find_impact(hist, init_ref_node_tree, context, pre_ref_node)
             markov_impact_all.update({event_index: {'home': impact_home, 'away': impact_away, 'end': 0}})
             pre_ref_node = target_ref_node
-
-            player_impact_sum = player_impact_dict[playerId]
-            if player_impact_sum is not None:
-                if home:
-                    player_impact_sum += impact_home
+            if event_action == focus_action or len(focus_action) == 0:
+                player_impact_sum = player_impact_dict[playerId]
+                if player_impact_sum is not None:
+                    if home:
+                        player_impact_sum += impact_home
+                    else:
+                        player_impact_sum += impact_away
                 else:
-                    player_impact_sum += impact_away
-            else:
-                if home:
-                    player_impact_sum = impact_home
-                else:
-                    player_impact_sum = impact_away
-            player_impact_dict[playerId] = player_impact_sum
+                    if home:
+                        player_impact_sum = impact_home
+                    else:
+                        player_impact_sum = impact_away
+                player_impact_dict[playerId] = player_impact_sum
 
-        with open(data_store_dir + game_dir.split('.')[0]+'/markov_impact_values.json', 'w')as f:
+        with open(data_store_dir + game_dir.split('.')[0] + '/markov_impact_values.json', 'w')as f:
             json.dump(obj=markov_impact_all, fp=f)
 
     print player_impact_dict
