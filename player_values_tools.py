@@ -40,7 +40,7 @@ def read_features_within_events(directory, data_path, feature_name_list):
 
 def find_Qs(hist, init_ref_node_tree, context):
     ref_node_tree_found = init_ref_node_tree.find_tag(hist[0])  # return a refNodeTree
-    print hist[0]
+    # print hist[0]
     assert ref_node_tree_found.obj.info is not None
     node2find = StateNode()  # create node
     node2find.context = context
@@ -73,6 +73,7 @@ def aggregate_player_impact(init_ref_node_tree, data_dir,
                             cluster, init_ref_node, data_store_dir,
                             focus_action, test_flag=False):
     player_impact_dict = {}
+    player_Q_dict = {}
     if test_flag:
         data_dir = '/Users/liu/Desktop/'
         dir_all = ['919069.json']  # TODO: testing
@@ -138,11 +139,29 @@ def aggregate_player_impact(init_ref_node_tree, data_dir,
             cluster_counter += 1
             hist = [str(nameInfo)]  # history ignored, so len(hist)=1
             # print hist
+
+            v_home, v_away = find_Qs(hist, init_ref_node_tree, context)
+            if focus_action in event_action or len(focus_action) == 0:
+                print('aggregate Q for action {0}'.format(event_action))
+                player_Q_sum = player_Q_dict.get(playerId)
+                if player_Q_sum is not None:
+                    if home:
+                        player_Q_sum += v_home
+                    else:
+                        player_Q_sum += v_away
+                else:
+                    if home:
+                        player_Q_sum = v_home
+                    else:
+                        player_Q_sum = v_away
+                    player_Q_dict[playerId] = player_Q_sum
+
             impact_home, impact_away, target_ref_node = find_impact(hist, init_ref_node_tree, context, pre_ref_node)
             markov_impact_all.update({event_index: {'home': impact_home, 'away': impact_away, 'end': 0}})
             pre_ref_node = target_ref_node
-            if event_action == focus_action or len(focus_action) == 0:
-                player_impact_sum = player_impact_dict[playerId]
+            if focus_action in event_action or len(focus_action) == 0:
+                print('aggregate action for action {0}'.format(event_action))
+                player_impact_sum = player_impact_dict.get(playerId)
                 if player_impact_sum is not None:
                     if home:
                         player_impact_sum += impact_home
@@ -155,8 +174,9 @@ def aggregate_player_impact(init_ref_node_tree, data_dir,
                         player_impact_sum = impact_away
                 player_impact_dict[playerId] = player_impact_sum
 
-        with open(data_store_dir + game_dir.split('.')[0] + '/markov_impact_values.json', 'w')as f:
+        with open(data_store_dir + game_dir.split('.')[0] + '/markov_impact_values{0}.json'.format(focus_action),
+                  'w')as f:
             json.dump(obj=markov_impact_all, fp=f)
 
-    print player_impact_dict
-    return player_impact_dict
+    # print player_impact_dict
+    return player_impact_dict, player_Q_dict
